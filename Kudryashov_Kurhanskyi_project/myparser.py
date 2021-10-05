@@ -105,7 +105,6 @@ def parse_search(command):
         # getting condition
         condition = command[3:]
         condition = ' '.join([elem for elem in condition])
-    # without WHERE
     return name, condition, 100
 
 def parse_condition(condition):

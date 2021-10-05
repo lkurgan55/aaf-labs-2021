@@ -16,7 +16,7 @@ def insert(name, text, collections_instances):
     # getting new index
     index = str(int(max(collections_instances[name].keys())) + 1) \
         if len(collections_instances[name].keys()) else 0
-    # adding text tp collections
+    # adding text to collections
     collections_instances[name].update({index: text})
     return collections_instances, name, index, 2
 
