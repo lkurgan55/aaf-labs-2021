@@ -14,8 +14,9 @@ def insert(name, text, collections_instances):
     if collections_instances.get(name) == None:
         return collections_instances, name, index, -5
     # getting new index
-    index = str(int(max(collections_instances[name].keys())) + 1) \
-        if len(collections_instances[name].keys()) else 0
+    indexes = [int(x) for x in collections_instances[name].keys()]
+    index = str(int(max(indexes)) + 1) \
+        if len(collections_instances[name].keys()) else '0'
     # adding text to collections
     collections_instances[name].update({index: text})
     return collections_instances, name, index, 2

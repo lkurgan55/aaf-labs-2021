@@ -1,4 +1,5 @@
 import json
+import os
 
 import myparser
 import commands
@@ -6,8 +7,13 @@ import commands
 collections_instances = {}
 
 # loading data
-with open("collections_instances.json", "r") as read_file:
-    collections_instances = json.load(read_file)
+if os.path.exists("./collections_instances.json"):
+    with open("collections_instances.json", "r") as read_file:
+        collections_instances = json.load(read_file)
+else:
+    pass
+
+
 
 print("Enter commands")
 

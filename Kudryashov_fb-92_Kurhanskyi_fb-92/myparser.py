@@ -117,7 +117,7 @@ def parse_condition(condition):
         condition = condition[1:-1]
         case = 1
     # keyword + '*'
-    elif condition[0] == "\"" and condition[-1] == "*":
+    elif condition[0] == "\"" and condition[-2] == "\"" and condition[-1] == "*":
         condition = condition[1:-2]
         case = 2
     # keyword1 <N> keyword2
