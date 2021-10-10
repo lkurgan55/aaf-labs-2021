@@ -20,7 +20,7 @@ print("Enter commands")
 while(True):
     status = 0
 
-    print(collections_instances)
+    print(collections_instances) # delete before release
     
     text = input(">>")
     text = myparser.cleaning_text(text)
@@ -65,8 +65,23 @@ while(True):
         collections_instances, name, status = commands.search(name, condition, case, collections_instances)
         commands.check_status(status)
 
+    elif command == "PRINT_INDEX":
+        name, status = myparser.parse_print_index(text)
+        commands.check_status(status)
+        if status < 0: continue
+
+        print(f"indexes from {name}")
+    
+    elif command == "SHOW":
+        status = myparser.parse_show(text)
+        commands.check_status(status)
+        if status < 0: continue
+        print(collections_instances)
 
     elif command == "EXIT":
+        status = myparser.parse_exit(text)
+        commands.check_status(status)
+        if status < 0: continue
         # saving data
         with open("collections_instances.json", "w") as write_file:
             json.dump(collections_instances, write_file)

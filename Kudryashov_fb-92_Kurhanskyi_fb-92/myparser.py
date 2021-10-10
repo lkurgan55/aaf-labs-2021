@@ -13,10 +13,11 @@ def cleaning_text(text):
     return text
 
 def define_command(command):
-    key_words = ["CREATE", "INSERT", "SEARCH", "REMOVE", "EXIT"]
+    key_words = ["CREATE", "INSERT", "SEARCH", "REMOVE", "EXIT", "PRINT_INDEX", "SHOW"]
     command = command.upper().split()
     # empy command or only command without parameters
-    if not len(command) or (len(command) < 2 and command[0] != "EXIT"):
+    if not len(command) or (len(command) < 2 and (command[0] != "EXIT" and \
+        command[0] != "SHOW")):
         return " ", -7
     if command[0] in key_words:
         return command[0], 100
@@ -88,7 +89,31 @@ def parse_remove(command):
     else:
         return case, name, index, -4
     return case, name, index, 100
-    
+
+def parse_print_index(command):
+    command = command.split()
+    name = command[1]
+
+    if len(command) > 2:
+        return name, -4
+
+    return name, 100
+
+def parse_show(command):
+    command = command.split()
+
+    if len(command) > 1:
+        return -4
+
+    return 100
+
+def parse_exit(command):
+    command = command.split()
+
+    if len(command) > 1:
+        return -4
+
+    return 100
 
 def parse_search(command):
     command = command.split()
