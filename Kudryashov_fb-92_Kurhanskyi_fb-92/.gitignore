@@ -1,5 +1,6 @@
 /__pycache__
 /.collections_instances.json
+/.inverted_indexes.json
 
 /__pycache__/commands.cpython-39.pyc
 /__pycache__/myparser.cpython-39.pyc
