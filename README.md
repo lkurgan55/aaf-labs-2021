@@ -1,3 +1,5 @@
+# Основи Аналізу Алгоритмів 2021: Комп'ютерний Практикум
+
 ## Корисні посилання
 - **Завдання практикуму**: https://docs.google.com/document/d/1-NpjvwB6mpn-HWuNhUVCpbKtujA8wR0cvJG6XZ5-Y94/edit?usp=sharing.
 - **Вступне відео**:
@@ -5,6 +7,7 @@
   - Частина 2: https://www.youtube.com/watch?v=QLcotJ0oLVA.
   - Презентація: https://docs.google.com/presentation/d/1j2ZJtroInNB-r72zG1KeAW8VmfMx37-GGyqVOt_hCeo/edit?usp=sharing.
 - **Інструкція з користування GitHub-ом**: https://docs.google.com/document/d/1Muo7uuaRVGhhJ5sBHU_BRKew3DluG2aOVgpuS889cJw/edit?usp=sharing.
+
 ## Графік дедлайнів*
 _* За виключенням індивідуально узгоджених графіків_
 
