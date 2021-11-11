@@ -1,3 +1,4 @@
+import re
 
 def create(name, collections_instances):
     # not unique name
@@ -19,7 +20,7 @@ def insert(name, text, collections_instances, inverted_indexes):
     # adding text to collections
     collections_instances[name].update({index: text})
     # creating inverted indexes
-    words = text.split()
+    words = re.split('[^a-zA-Z0-9_]+', text)
 
     for i in range(len(words)):
         if words[i] in inverted_indexes.keys():
