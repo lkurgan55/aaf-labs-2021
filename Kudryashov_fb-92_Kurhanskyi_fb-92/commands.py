@@ -1,90 +1,132 @@
 import re
-
-def create(name, collections_instances):
+from tree import Node
+def create(col, collections_instances):
     # not unique name
-    if name in collections_instances.keys():
-        return collections_instances, name, -3
+    if col in collections_instances.keys():
+        return collections_instances, col, -3
 
-    collections_instances[name] = {}
-    return collections_instances, name, 1
+    collections_instances[col] = {}
+    return collections_instances, col, 1
 
-def insert(name, text, collections_instances, inverted_indexes):
+def insert(col, text, collections_instances, inverted_indexes):
     index = 0
     # incorrect name        
-    if collections_instances.get(name) == None:
-        return collections_instances, inverted_indexes, name, index, -5
+    if collections_instances.get(col) == None:
+        return collections_instances, inverted_indexes, col, index, -5
     # getting new index
-    indexes = [int(x) for x in collections_instances[name].keys()]
-    index = str(int(max(indexes)) + 1) \
-        if len(collections_instances[name].keys()) else '0'
+    indexes = [int(x) for x in collections_instances[col].keys()]
+    doc = int(max(indexes)) + 1 \
+        if len(collections_instances[col].keys()) else 0
     # adding text to collections
-    collections_instances[name].update({index: text})
+    collections_instances[col].update({doc: text})
     # creating inverted indexes
     words = re.split('[^a-zA-Z0-9_]+', text)
 
-    for i in range(len(words)):
-        if words[i] in inverted_indexes.keys():
-            try: 
-                inverted_indexes[words[i]][name][index].append(i)
-            except: 
-                try: inverted_indexes[words[i]][name][index] = [i]
-                except: inverted_indexes[words[i]][name] = {index: [i]}
-                
-        else: # {"world": {colection1:{ doc1: [номер в тексте]: }
-            inverted_indexes[words[i]] = {name:{index:[i]}}
+    if col not in inverted_indexes.keys():
+        inverted_indexes[col] = Node(words[0], doc, 0)
+        range_list = range(1,len(words))
+    else:  
+        range_list = range(len(words))
 
-    return collections_instances, inverted_indexes, name, index, 2
+    for i in range_list: # {colection1: Tree}
+        inverted_indexes[col].insert(words[i], doc, i)
 
-def remove(case, name, collections_instances, inverted_indexes, index = 0):
-    index = str(index)
-    # incorrect name        
-    if collections_instances.get(name) == None:
-        return collections_instances, name, inverted_indexes, index, -5
-    
-    if case == 1: # removing colection {"world": {colection1:{ doc1: [номер в тексте]: }
-        collections_instances.pop(name)
-        for word in inverted_indexes.keys():
-            try:
-                inverted_indexes[word].pop(name)
-            except: pass
-        return collections_instances, name, inverted_indexes, index, 3
-    elif case == 2: # removing doc from colection
-        if collections_instances[name].get(index) == None:
-            return collections_instances, name, inverted_indexes, index, -11
-        collections_instances[name].pop(index)
-        for word in inverted_indexes.keys():
-            try:
-                inverted_indexes[word][name].pop(index)
-            except: pass
-
-        return collections_instances, name, inverted_indexes, index, 4
+    return collections_instances, inverted_indexes, col, doc, 2
 
 def exit(command):
     pass
 
-def search(name, condition, case, collections_instances):
+def search(col, condition, case, collections_instances, inverted_indexes):
     # incorrect name        
-    if collections_instances.get(name) == None:
-        return collections_instances, name, -5
+    if collections_instances.get(col) == None:
+        return collections_instances, col, -5
+    
+    # collection is empty
+    if collections_instances[col] == {}:
+        return collections_instances, col, -14
 
-    print(f"searching in collection: {name} case: {case}")
-    print(f"Condition: {condition}")
+    #print(f"searching in collection: {col} case: {case}")
+    #print(f"Condition: {condition} \n")
 
-    return collections_instances, name, 100
+    result = None
 
-def print_indexex(name, inverted_indexes):    
-    for word in inverted_indexes.keys():
-        if name not in inverted_indexes[word].keys(): continue
-        print(f'"{word}":')
-        for doc in inverted_indexes[word][name]:
-            print(f"{doc} -> {inverted_indexes[word][name][doc]}")
+    if case == 0:
+        print(collections_instances[col])
+        result = True
 
-def check_status(status, name ="", index = 0):
+    elif case == 1:
+        result = inverted_indexes[col].find1(condition.lower())
+        if result != None:
+            for doc in result.keys():
+                print(f"doc #{doc}: {result[doc]}")
+
+    elif case == 2:
+        result = inverted_indexes[col].find2(condition.lower())
+        if result != []:
+            for elem in result:
+                print(elem)
+        else: result = None
+    elif case == 3:
+        word1 = condition[0].lower()
+        word2 = condition[1].lower()
+        n = condition[2] + 1
+
+        # getting inverted indexes for keywords
+        w1_index = inverted_indexes[col].find1(word1)
+        w2_index = inverted_indexes[col].find1(word2)
+
+        if w1_index == None or w2_index == None: # incorrect keyword
+            return collections_instances, col, -15
+
+        #print(w1_index)
+        #print(w2_index)
+
+        docs = list(set(w1_index.keys()) & set(w2_index.keys())) # the common docs
+        for doc in docs:
+            found = False
+            if abs(w2_index[doc][-1] - w1_index[doc][0]) < n: # unreal condition
+                continue
+            i, j = 0, 0
+            while(i < len(w2_index[doc]) and j < len(w1_index[doc])):
+                #print(i, j)
+                if abs(w2_index[doc][i] - w1_index[doc][j]) == n:
+                    print(f"doc #{doc}: {collections_instances[col][doc]}")
+                    print(f"{word1}: {w1_index[doc][j]}, {word2}: {w2_index[doc][i]} \n")
+                    result = True 
+                    found = True
+                    break
+                elif w2_index[doc][i] - w1_index[doc][j] < n: i += 1
+                elif w2_index[doc][i] - w1_index[doc][j] > n: j += 1
+            
+            if found: continue
+            
+            i, j = 0, 0
+            w2_index, w1_index = w1_index, w2_index # replace word1 and word2
+            while(i < len(w2_index[doc]) and j < len(w1_index[doc])):
+                #print(i, j)
+                if abs(w2_index[doc][i] - w1_index[doc][j]) == n:
+                    print(f"doc #{doc}: {collections_instances[col][doc]}")
+                    print(f"{word2}: {w1_index[doc][j]}, {word1}: {w2_index[doc][i]} \n")
+                    result = True 
+                    break
+                elif w2_index[doc][i] - w1_index[doc][j] < n: i += 1
+                elif w2_index[doc][i] - w1_index[doc][j] > n: j += 1
+    
+    if result == None:
+        return collections_instances, col, -13
+
+    return collections_instances, col, 100
+
+def print_indexes(col, inverted_indexes):
+    inverted_indexes[col].PrintTree()    
+    
+
+def check_status(status, col ="", index = 0):
     statuses = {
-        4: f"text index {index} has been deleted from collection {name}",
-        3: f"Collection {name} has been deleted",
-        2: f"The text has been added to '{name}' by index {index}!",
-        1: f"New collection '{name}' has been created!",
+        4: f"text index {index} has been deleted from collection {col}",
+        3: f"Collection {col} has been deleted",
+        2: f"The text has been added to '{col}' by index {index}!",
+        1: f"New collection '{col}' has been created!",
         0: "Command not found!",
         -1: "Incorect first symbol in name!",
         -2: "Incorect symbol in name!",
@@ -97,7 +139,10 @@ def check_status(status, name ="", index = 0):
         -9: "Missing condition!",
         -10: "Incorrect syntax!",
         -11: "Incorrect index!",
-        -12: "Missing text!"
+        -12: "Missing text!",
+        -13: "I have found nothing :(",
+        -14: "The collection is empty!",
+        -15: "Keyword is not found!"
     }
 
     if status != 100:

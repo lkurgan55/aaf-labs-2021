@@ -71,8 +71,8 @@ def parse_insert(command):
 
     # getting text
     text = ' '.join([elem for elem in command[2:index+1]])
-    text = text.strip("\"")
-
+    text = text.strip("\"").strip()
+    print(f"'{text}'")
     return name, text, 100
 
 def parse_remove(command):

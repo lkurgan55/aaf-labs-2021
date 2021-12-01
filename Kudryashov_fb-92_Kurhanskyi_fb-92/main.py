@@ -1,36 +1,24 @@
-import json
-import os
-
 import myparser
 import commands
 
 collections_instances = {}
 inverted_indexes = {} # {"world": {colection1:{ doc1: [номер в тексте]: }
 
-# loading data
-if os.path.exists("./collections_instances.json"):
-    with open("collections_instances.json", "r") as read_file:
-        collections_instances = json.load(read_file)
-else:
-    pass
-
-if os.path.exists("./inverted_indexes.json"):
-    with open("inverted_indexes.json", "r") as read_file:
-        inverted_indexes = json.load(read_file)
-else:
-    pass
-
-
 print("Enter commands")
 
 while(True):
     status = 0
 
-    print(collections_instances) # delete before release
-    print(inverted_indexes) # delete before release
-    
-    text = input(">>")
+    #print(collections_instances) # delete before release
+  
+    text = ""
+
+    while(text.find(";") == -1): # multiline input
+        text += " "
+        text += input(">>")
+
     text = myparser.cleaning_text(text)
+    
 
     command, status = myparser.define_command(text)
     commands.check_status(status)
@@ -69,16 +57,15 @@ while(True):
         commands.check_status(status)
         if status <= 0: continue
 
-        collections_instances, name, status = commands.search(name, condition, case, collections_instances)
+        collections_instances, name, status = commands.search(name, condition, case, collections_instances, inverted_indexes)
         commands.check_status(status)
 
     elif command == "PRINT_INDEX":
         name, status = myparser.parse_print_index(text)
         commands.check_status(status)
         if status < 0: continue
-        commands.print_indexex(name, inverted_indexes)
+        commands.print_indexes(name, inverted_indexes)
 
-    
     elif command == "SHOW":
         status = myparser.parse_show(text)
         commands.check_status(status)
@@ -89,11 +76,6 @@ while(True):
         status = myparser.parse_exit(text)
         commands.check_status(status)
         if status < 0: continue
-        # saving data
-        with open("collections_instances.json", "w") as write_file:
-            json.dump(collections_instances, write_file)
-        with open("inverted_indexes.json", "w") as write_file:
-            json.dump(inverted_indexes, write_file)
         break
     else:
         commands.check_status(0)
