@@ -24,7 +24,7 @@ def insert(col, text, collections_instances, inverted_indexes):
     words = re.split('[^a-zA-Z0-9_]+', text)
     while '' in words: words.remove('')
     words = [x.lower() for x in words]
-    print(words)
+    #print(words)
     if col not in inverted_indexes.keys():
         inverted_indexes[col] = Node(words[0], doc, 0)
         range_list = range(1,len(words))
