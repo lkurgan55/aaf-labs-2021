@@ -20,8 +20,11 @@ def insert(col, text, collections_instances, inverted_indexes):
     # adding text to collections
     collections_instances[col].update({doc: text})
     # creating inverted indexes
+    
     words = re.split('[^a-zA-Z0-9_]+', text)
-
+    while '' in words: words.remove('')
+    words = [x.lower() for x in words]
+    print(words)
     if col not in inverted_indexes.keys():
         inverted_indexes[col] = Node(words[0], doc, 0)
         range_list = range(1,len(words))
@@ -51,7 +54,8 @@ def search(col, condition, case, collections_instances, inverted_indexes):
     result = None
 
     if case == 0:
-        print(collections_instances[col])
+        for doc in collections_instances[col]:
+            print(f"{doc}: \"{collections_instances[col][doc]}\"")
         result = True
 
     elif case == 1:

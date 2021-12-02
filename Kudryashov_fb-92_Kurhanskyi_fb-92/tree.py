@@ -65,6 +65,8 @@ class Node:
     def PrintTree(self):
         if self.left:
             self.left.PrintTree()
-        print(self),
+        print(f"{self.word}:")
+        for doc in self.indexes.keys():
+            print(f"  {doc} -> {self.indexes[doc]}")
         if self.right:
             self.right.PrintTree()
