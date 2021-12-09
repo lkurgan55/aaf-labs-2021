@@ -62,18 +62,22 @@ def search(col, condition, case, collections_instances, inverted_indexes):
         result = inverted_indexes[col].find1(condition.lower())
         if result != None:
             for doc in result.keys():
-                print(f"doc #{doc}: {result[doc]}")
+                print(f"{doc}: \"{collections_instances[col][doc]}\"")
 
     elif case == 2:
         result = inverted_indexes[col].find2(condition.lower())
+        list_docs = []
         if result != []:
             for elem in result:
-                print(elem)
+                list_docs += elem.indexes.keys()
+            list_docs = list(set(list_docs))
+            for doc in list_docs:
+                print(f"{doc}: \"{collections_instances[col][doc]}\"")
         else: result = None
     elif case == 3:
         word1 = condition[0].lower()
         word2 = condition[1].lower()
-        n = condition[2] + 1
+        n = condition[2]
 
         # getting inverted indexes for keywords
         w1_index = inverted_indexes[col].find1(word1)
@@ -94,8 +98,7 @@ def search(col, condition, case, collections_instances, inverted_indexes):
             while(i < len(w2_index[doc]) and j < len(w1_index[doc])):
                 #print(i, j)
                 if abs(w2_index[doc][i] - w1_index[doc][j]) == n:
-                    print(f"doc #{doc}: {collections_instances[col][doc]}")
-                    print(f"{word1}: {w1_index[doc][j]}, {word2}: {w2_index[doc][i]} \n")
+                    print(f"{doc}: {collections_instances[col][doc]}")
                     result = True 
                     found = True
                     break
@@ -109,8 +112,7 @@ def search(col, condition, case, collections_instances, inverted_indexes):
             while(i < len(w2_index[doc]) and j < len(w1_index[doc])):
                 #print(i, j)
                 if abs(w2_index[doc][i] - w1_index[doc][j]) == n:
-                    print(f"doc #{doc}: {collections_instances[col][doc]}")
-                    print(f"{word2}: {w1_index[doc][j]}, {word1}: {w2_index[doc][i]} \n")
+                    print(f"{doc}: {collections_instances[col][doc]}")
                     result = True 
                     break
                 elif w2_index[doc][i] - w1_index[doc][j] < n: i += 1
