@@ -1,11 +1,17 @@
 import re
 from tree import Node
+
+class Collection:
+    def __init__(self):
+        self.indx = 0
+        self.docs = {}
+
 def create(col, collections_instances):
     # not unique name
     if col in collections_instances.keys():
         return collections_instances, col, -3
 
-    collections_instances[col] = {}
+    collections_instances[col] = Collection()
     return collections_instances, col, 1
 
 def insert(col, text, collections_instances, inverted_indexes):
@@ -14,11 +20,11 @@ def insert(col, text, collections_instances, inverted_indexes):
     if collections_instances.get(col) == None:
         return collections_instances, inverted_indexes, col, index, -5
     # getting new index
-    indexes = [int(x) for x in collections_instances[col].keys()]
-    doc = int(max(indexes)) + 1 \
-        if len(collections_instances[col].keys()) else 0
+    
+    doc = collections_instances[col].indx
+    collections_instances[col].indx += 1
     # adding text to collections
-    collections_instances[col].update({doc: text})
+    collections_instances[col].docs.update({doc: text})
     # creating inverted indexes
     
     words = re.split('[^a-zA-Z0-9_]+', text)
@@ -45,7 +51,7 @@ def search(col, condition, case, collections_instances, inverted_indexes):
         return collections_instances, col, -5
     
     # collection is empty
-    if collections_instances[col] == {}:
+    if collections_instances[col].docs == {}:
         return collections_instances, col, -14
 
     #print(f"searching in collection: {col} case: {case}")
@@ -54,26 +60,27 @@ def search(col, condition, case, collections_instances, inverted_indexes):
     result = None
 
     if case == 0:
-        for doc in collections_instances[col]:
-            print(f"{doc}: \"{collections_instances[col][doc]}\"")
+        for doc in collections_instances[col].docs:
+            print(f"{doc}: \"{collections_instances[col].docs[doc]}\"")
         result = True
 
     elif case == 1:
         result = inverted_indexes[col].find1(condition.lower())
         if result != None:
             for doc in result.keys():
-                print(f"{doc}: \"{collections_instances[col][doc]}\"")
+                print(f"{doc}: \"{collections_instances[col].docs[doc]}\"")
 
     elif case == 2:
         result = inverted_indexes[col].find2(condition.lower())
-        list_docs = []
+        set_docs = set()
         if result != []:
             for elem in result:
-                list_docs += elem.indexes.keys()
-            list_docs = list(set(list_docs))
-            for doc in list_docs:
-                print(f"{doc}: \"{collections_instances[col][doc]}\"")
+                set_docs.update(elem.indexes.keys())
+            
+            for doc in set_docs:
+                print(f"{doc}: \"{collections_instances[col].docs[doc]}\"")
         else: result = None
+
     elif case == 3:
         word1 = condition[0].lower()
         word2 = condition[1].lower()
@@ -92,13 +99,12 @@ def search(col, condition, case, collections_instances, inverted_indexes):
         docs = list(set(w1_index.keys()) & set(w2_index.keys())) # the common docs
         for doc in docs:
             found = False
-            if abs(w2_index[doc][-1] - w1_index[doc][0]) < n: # unreal condition
-                continue
+            ###if abs(w2_index[doc][-1] - w1_index[doc][0]) < n: continue # unreal condition
             i, j = 0, 0
             while(i < len(w2_index[doc]) and j < len(w1_index[doc])):
                 #print(i, j)
                 if abs(w2_index[doc][i] - w1_index[doc][j]) == n:
-                    print(f"{doc}: {collections_instances[col][doc]}")
+                    print(f"{doc}: {collections_instances[col].docs[doc]}")
                     result = True 
                     found = True
                     break
@@ -112,7 +118,7 @@ def search(col, condition, case, collections_instances, inverted_indexes):
             while(i < len(w2_index[doc]) and j < len(w1_index[doc])):
                 #print(i, j)
                 if abs(w2_index[doc][i] - w1_index[doc][j]) == n:
-                    print(f"{doc}: {collections_instances[col][doc]}")
+                    print(f"{doc}: {collections_instances[col].docs[doc]}")
                     result = True 
                     break
                 elif w2_index[doc][i] - w1_index[doc][j] < n: i += 1
@@ -124,8 +130,8 @@ def search(col, condition, case, collections_instances, inverted_indexes):
     return collections_instances, col, 100
 
 def print_indexes(col, inverted_indexes):
-    inverted_indexes[col].PrintTree()    
-    
+    if len(inverted_indexes.keys()) > 0: inverted_indexes[col].PrintTree()    
+    else: print("The collection is empty!")
 
 def check_status(status, col ="", index = 0):
     statuses = {
