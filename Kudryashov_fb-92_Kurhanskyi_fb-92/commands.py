@@ -130,8 +130,10 @@ def search(col, condition, case, collections_instances, inverted_indexes):
     return collections_instances, col, 100
 
 def print_indexes(col, inverted_indexes):
-    if len(inverted_indexes.keys()) > 0: inverted_indexes[col].PrintTree()    
-    else: print("The collection is empty!")
+    if col in inverted_indexes.keys():
+        inverted_indexes[col].PrintTree()    
+    else: print("Collection not found or is empty!")
+    
 
 def check_status(status, col ="", index = 0):
     statuses = {
